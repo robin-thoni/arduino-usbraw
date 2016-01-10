@@ -25,14 +25,8 @@ typedef uint8_t byte;
   }                             \
 } while(0)
 
-#define BUFFER_SIZE 4 // Minimum of 2: 1 for modifiers + 1 for keystroke 
+#define BUFFER_SIZE 64
 
-typedef struct{
-    uchar   buttonMask;
-    char    dx;
-    char    dy;
-    char    dWheel;
-}report_t;
 
 static uchar    idleRate;/* repeat rate for keyboards, never used for mice */
 
@@ -45,9 +39,11 @@ public:
     void update() {
         usbPoll();
     }
+
+    void sendData(const char* data, unsigned size = 0);
     
     //private: TODO: Make friend?
-    report_t reportBuffer;    // buffer for HID reports [ 1 modifier byte + (len-1) key strokes]
+    byte reportBuffer[BUFFER_SIZE];    // buffer for HID reports [ 1 modifier byte + (len-1) key strokes]
 
 private:
 
