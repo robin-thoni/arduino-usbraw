@@ -1,0 +1,51 @@
+/*
+ * Based on Obdev's AVRUSB code and under the same license.
+ * Modified by Robin Thoni <robin@rthoni.com>
+ */
+#ifndef __UsbRaw_h__
+#define __UsbRaw_h__
+
+#include <avr/pgmspace.h>
+#include <avr/interrupt.h>
+#include <Arduino.h>
+
+#include "usbdrv.h"
+
+#define CALLBACK_ARGS usbRequest_t* rq, UsbRawDevice* dev, uchar* data, uchar len
+
+class UsbRawDevice {
+public:
+    UsbRawDevice();
+
+    void init();
+    
+    void poll();
+
+    void setData(const uchar* data, uchar len);
+
+    void setDataString(const char* data);
+
+    usbMsgLen_t _usbFunctionSetup(usbRequest_t* rq);
+
+    uchar _usbFunctionWrite(uchar *data, uchar len);
+
+    void setCallback(void (*callback)(CALLBACK_ARGS));
+
+private:
+
+    const uchar* _dataSend;
+
+    uchar _dataSendLen;
+
+    void (*_callback)(CALLBACK_ARGS);
+
+    uchar* _dataReceived;
+
+    uchar _dataReceivedLen;
+
+    usbRequest_t* _rq;
+};
+
+extern UsbRawDevice UsbRaw;
+
+#endif // __UsbRaw_h__
