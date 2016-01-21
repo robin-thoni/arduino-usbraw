@@ -25,6 +25,8 @@ public:
 
     void setDataString(const char* data);
 
+    void setDataUsbNoMsg();
+
     usbMsgLen_t _usbFunctionSetup(usbRequest_t* rq);
 
     uchar _usbFunctionWrite(uchar *data, uchar len);
@@ -39,11 +41,7 @@ private:
 
     void (*_callback)(CALLBACK_ARGS);
 
-    uchar* _dataReceived;
-
-    uchar _dataReceivedLen;
-
-    usbRequest_t* _rq;
+    usbRequest_t _rq;
 };
 
 extern UsbRawDevice UsbRaw;

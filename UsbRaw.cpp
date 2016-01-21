@@ -9,9 +9,7 @@ UsbRawDevice UsbRaw = UsbRawDevice();
 UsbRawDevice::UsbRawDevice()
     : _dataSend(0),
       _dataSendLen(0),
-      _callback(0),
-      _dataReceived(0),
-      _dataReceivedLen(0)
+      _callback(0)
 {
 }
 
@@ -40,12 +38,17 @@ void UsbRawDevice::setData(const uchar* data, uchar len)
 
 void UsbRawDevice::setDataString(const char* data)
 {
-    setData((const uchar*)data, strlen(data));
+    setData((const uchar*)data, strlen(data) + 1);
+}
+
+void UsbRawDevice::setDataUsbNoMsg()
+{
+    setData(0, USB_NO_MSG);
 }
 
 usbMsgLen_t UsbRawDevice::_usbFunctionSetup(usbRequest_t* rq)
 {
-    _rq = rq;
+    _rq = *rq;
     if (_callback)
     {
         _callback(rq, this, 0, 0);
@@ -58,11 +61,9 @@ usbMsgLen_t UsbRawDevice::_usbFunctionSetup(usbRequest_t* rq)
 
 uchar UsbRawDevice::_usbFunctionWrite(uchar *data, uchar len)
 {
-    free(_dataReceived);
-    _dataReceived = (uchar*)memcpy(malloc(len), data, _dataReceivedLen = len);
     if (_callback)
     {
-        _callback(_rq, this, _dataReceived, len);
+        _callback(&_rq, this, data, len);
     }
     return 1;
 }
