@@ -9,7 +9,9 @@ UsbRawDevice UsbRaw = UsbRawDevice();
 UsbRawDevice::UsbRawDevice()
     : _dataSend(0),
       _dataSendLen(0),
-      _callback(0)
+      _callback(0),
+      _dataReceivePos(0),
+      _dataReceiveLen(0)
 {
 }
 
@@ -49,6 +51,8 @@ void UsbRawDevice::setDataUsbNoMsg()
 usbMsgLen_t UsbRawDevice::_usbFunctionSetup(usbRequest_t* rq)
 {
     _rq = *rq;
+    _dataReceiveLen = min((uchar)rq->wLength.word, USB_RAW_DEVICE_BUFFER_SIZE);
+    _dataReceivePos = 0;
     if (_callback)
     {
         _callback(rq, this, 0, 0);
@@ -61,11 +65,19 @@ usbMsgLen_t UsbRawDevice::_usbFunctionSetup(usbRequest_t* rq)
 
 uchar UsbRawDevice::_usbFunctionWrite(uchar *data, uchar len)
 {
-    if (_callback)
+    for (uchar i = 0; i < len && _dataReceivePos < _dataReceiveLen; ++i, ++_dataReceivePos)
     {
-        _callback(&_rq, this, data, len);
+        _dataReceive[_dataReceivePos] = data[i];
     }
-    return 1;
+    if (_dataReceiveLen == _dataReceivePos)
+    {
+        if (_callback)
+        {
+            _callback(&_rq, this, _dataReceive, _dataReceiveLen);
+        }
+        return 1;
+    }
+    return 0;
 }
 
 void UsbRawDevice::setCallback(void (*callback)(CALLBACK_ARGS))

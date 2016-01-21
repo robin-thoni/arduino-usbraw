@@ -13,6 +13,10 @@
 
 #define CALLBACK_ARGS usbRequest_t* rq, UsbRawDevice* dev, uchar* data, uchar len
 
+#ifndef USB_RAW_DEVICE_BUFFER_SIZE
+#define USB_RAW_DEVICE_BUFFER_SIZE 32
+#endif
+
 class UsbRawDevice {
 public:
     UsbRawDevice();
@@ -42,6 +46,12 @@ private:
     void (*_callback)(CALLBACK_ARGS);
 
     usbRequest_t _rq;
+
+    uchar _dataReceive[USB_RAW_DEVICE_BUFFER_SIZE];
+
+    uchar _dataReceivePos;
+
+    uchar _dataReceiveLen;
 };
 
 extern UsbRawDevice UsbRaw;
