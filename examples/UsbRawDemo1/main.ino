@@ -9,18 +9,6 @@ uchar buffer[50];
 
 void callback(CALLBACK_ARGS)
 {
-    /*digitalWrite(ledPin, !digitalRead(ledPin));
-    delay(100);*/
-
-    /*if (data)
-    {
-        strcpy((char *) buffer, (const char *) data);
-
-        digitalWrite(ledPin, !digitalRead(ledPin));
-        delay(200);
-        digitalWrite(ledPin, !digitalRead(ledPin));
-    }*/
-
     if (rq->bRequest == 0)
     {
         digitalWrite(ledPin, 0);
@@ -29,13 +17,14 @@ void callback(CALLBACK_ARGS)
     {
         digitalWrite(ledPin, 1);
     }
+    else if (rq->bRequest == 2)
+    {
+        dev->setDataString((const char*)buffer);
+    }
     else if (rq->bRequest == 4)
     {
         if (data)
         {
-            digitalWrite(ledPin, !digitalRead(ledPin));
-            delay(200);
-            digitalWrite(ledPin, !digitalRead(ledPin));
             strcpy((char *) buffer, (const char *) data);
         }
         else
@@ -45,7 +34,7 @@ void callback(CALLBACK_ARGS)
     }
     else
     {
-        dev->setData(buffer, strlen((const char*)buffer) + 1);
+        dev->setDataUsbNoMsg();
     }
 }
 
